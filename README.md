@@ -29,6 +29,7 @@ Also, I had a quick look on the corresponding [pull request](https://github.com/
     The basic idea here is that the mapping function will return a `Try[RESULT]` as it wraps the function into a `Future` with a blocking `await`. 
     The simples out of the two is `TimeoutMap`, as there is no need for joining anything and the processing can go. 
     See `org.tupol.flink.timeout.TimeoutDemo` 1 to 4.
+    The main problem with these approaches is that an extra thread is created inside each `Task` thread and it would be better if there would be a watchdog per `Task` to deal with the timeout of each thread.
 
 
 4.  ***If you want to go deeper, the API needs to support a transformation timeout on record and on window***

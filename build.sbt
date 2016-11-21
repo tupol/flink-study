@@ -17,3 +17,10 @@ lazy val providedDependencies = Seq(
 )
 
 libraryDependencies ++= providedDependencies.map(_ % "provided")
+
+
+libraryDependencies ++= Seq(
+  "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.6" % "test",
+  "org.apache.flink" %% "flink-test-utils" % flinkVersion % "test" force()
+)

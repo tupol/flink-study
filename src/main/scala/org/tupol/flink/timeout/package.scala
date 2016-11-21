@@ -53,6 +53,15 @@ package object timeout {
   }
 
   /**
+   * Define a simple type for our records, having a string key and a random number, which we will use to
+   * start a "timeConsumingOperation" and for all the demos in this package.
+   * @param key
+   * @param time
+   */
+  case class Record(key: String, time: Long)
+
+
+  /**
    * Basic demo function
    */
   trait DemoStreamProcessor {
@@ -80,7 +89,7 @@ package object timeout {
    * @param size
    * @return
    */
-  def createRecordsStreamFromCollection(env: StreamExecutionEnvironment, size: Int = 20): DataStream[Record] = {
+  def createRandomRecordsStream(env: StreamExecutionEnvironment, size: Int = 20): DataStream[Record] = {
     val inputRecords: Seq[Record] = (0 to size) map { x => Record(f"key_$x%03d", scala.util.Random.nextInt(5000)) }
     env.fromCollection(inputRecords)
   }

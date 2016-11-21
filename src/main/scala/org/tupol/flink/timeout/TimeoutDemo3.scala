@@ -23,7 +23,7 @@ object TimeoutDemo3 extends DemoStreamProcessor with OutputFile {
     senv.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime)
 
     // Setup the actual demo
-    demoStreamProcessor(createRecordsStreamFromCollection(senv), outputFile(args))
+    demoStreamProcessor(createRandomRecordsStream(senv), outputFile(args))
 
     // Setup the actual demo
     senv.execute(s"${this.getClass.getSimpleName}")
@@ -38,15 +38,15 @@ object TimeoutDemo3 extends DemoStreamProcessor with OutputFile {
    */
   override def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String): Unit = {
     // Trigger some time consuming operations
-    val asyncStream: DataStream[(String, Try[String])] = inputStream
+    val heavyWorkStream: DataStream[(String, Try[String])] = inputStream
       .map(record => (record.key, record))
       .map(TimeoutKeyedMap[String, Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
       .setParallelism(4)
 
-    asyncStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
+//    heavyWorkStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
 
-    val joinedStream = inputStream.join(asyncStream).where(_.key).equalTo(_._1)
-      .window(TumblingProcessingTimeWindows.of(Time.seconds(2)))
+    val joinedStream = inputStream.join(heavyWorkStream).where(_.key).equalTo(_._1)
+      .window(TumblingProcessingTimeWindows.of(Time.seconds(3)))
       .apply{ (a, b) => (a, b._2) }
       .setParallelism(2)
 

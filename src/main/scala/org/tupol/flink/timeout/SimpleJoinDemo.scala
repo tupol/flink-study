@@ -43,14 +43,14 @@ object SimpleJoinDemo extends DemoStreamProcessor with OutputFile {
   override def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String): Unit = {
 
     // Trigger some time consuming operations
-    val asyncStream: DataStream[(Record, Try[String])] = inputStream
+    val heavyWorkStream: DataStream[(Record, Try[String])] = inputStream
       .map{ record => (record, Try(timeConsumingOperation(record.time))) }
       .setParallelism(4)
       .keyBy(0)
 
-    asyncStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
+    heavyWorkStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
 
-    val joinedStream = inputStream.join(asyncStream.filter(_._2.isSuccess)).where(_.key).equalTo(_._1.key)
+    val joinedStream = inputStream.join(heavyWorkStream.filter(_._2.isSuccess)).where(_.key).equalTo(_._1.key)
       .window(TumblingProcessingTimeWindows.of(Time.seconds(2)))
       .apply{ (a, b) => (a, b) }
       .setParallelism(2)
