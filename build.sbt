@@ -24,3 +24,10 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.6" % "test",
   "org.apache.flink" %% "flink-test-utils" % flinkVersion % "test" force()
 )
+
+
+// ------------------------------
+// TESTING
+parallelExecution in Test := false
+
+fork in Test := true

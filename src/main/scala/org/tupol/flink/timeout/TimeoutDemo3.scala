@@ -43,7 +43,7 @@ object TimeoutDemo3 extends DemoStreamProcessor with OutputFile {
       .map(TimeoutKeyedMap[String, Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
       .setParallelism(4)
 
-//    heavyWorkStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
+    heavyWorkStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
 
     val joinedStream = inputStream.join(heavyWorkStream).where(_.key).equalTo(_._1)
       .window(TumblingProcessingTimeWindows.of(Time.seconds(3)))
