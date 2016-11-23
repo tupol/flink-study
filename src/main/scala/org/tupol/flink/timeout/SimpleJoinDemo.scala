@@ -5,6 +5,7 @@ import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
+import utils._
 
 import scala.util.Try
 
@@ -55,6 +56,8 @@ object SimpleJoinDemo extends DemoStreamProcessor with OutputFile {
       .apply{ (a, b) => (a, b) }
       .setParallelism(2)
 
-    joinedStream.writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
+    joinedStream
+      .setParallelism(1)
+      .writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
   }
 }
