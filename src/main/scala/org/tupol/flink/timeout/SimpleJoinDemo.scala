@@ -56,6 +56,8 @@ object SimpleJoinDemo extends DemoStreamProcessor with OutputFile {
       .apply{ (a, b) => (a, b) }
       .setParallelism(2)
 
-    joinedStream.writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
+    joinedStream
+      .setParallelism(1)
+      .writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
   }
 }

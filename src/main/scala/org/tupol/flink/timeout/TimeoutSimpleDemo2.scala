@@ -14,7 +14,7 @@ import utils._
  * Simple demo based on the initial raw idea for using async await, but this time bundling the original initial
  * record with the attempt to collect the result of hte time consuming operation.
   */
-object TimeoutDemo2 extends DemoStreamProcessor with OutputFile {
+object TimeoutSimpleDemo2 extends DemoStreamProcessor with OutputFile {
 
   /** Main program method */
   def main(args: Array[String]) : Unit = {
@@ -57,7 +57,9 @@ object TimeoutDemo2 extends DemoStreamProcessor with OutputFile {
       .apply{ (a, b) => (a, b._2) }
       .setParallelism(2)
 
-    joinedStream.writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
+    joinedStream
+      .setParallelism(1)
+      .writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
 
   }
 }

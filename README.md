@@ -28,7 +28,8 @@ Also, I had a quick look on the corresponding [pull request](https://github.com/
     I have added two ideas for a `RichMapFunction`: `TimeoutMap` and `TimeoutKeyedMap`.
     The basic idea here is that the mapping function will return a `Try[RESULT]` as it wraps the function into a `Future` with a blocking `await`. 
     The simples out of the two is `TimeoutMap`, as there is no need for joining anything and the processing can go. 
-    See `org.tupol.flink.timeout.TimeoutDemo` 1 to 4.
+    See `org.tupol.flink.timeout.TimeoutSimpleDemo` 1 and 2 for a really basic idea implementation.
+    See `org.tupol.flink.timeout.TimeoutMapDemo` and `TimeoutKeyedMapDemo` for a more structured implementation of these ideas.
     The main problem with these approaches is that an extra thread is created inside each `Task` thread and it would be better if there would be a watchdog per `Task` to deal with the timeout of each thread.
 
 4.  ***If you want to go deeper, the API needs to support a transformation timeout on record and on window***
@@ -38,19 +39,23 @@ Also, I had a quick look on the corresponding [pull request](https://github.com/
 
 Code for this study is available in the `org.tupol.flink.timeout` package.
 
-| Class             | Description                                                                | Tests              |
-| ----------------- | -------------------------------------------------------------------------- | ------------------ |
-| `SimpleJoinDemo`  | Using the "natural" timeout and then join the result with original stream  | None               |
-| `TimeoutDemo1`    | Like `SimpleJoinDemo` with a coded "timeout"                               | None               |
-| `TimeoutDemo2`    | Like `TimeoutDemo1` with a different result type for the `heavyWorkStream` | None               |
-| `TimeoutDemo3`    | Sample use of `TimeoutKeyedMap`                                            | `TimeoutDemo3Spec` |
-| `TimeoutDemo4`    | Sample use of `TimeoutMap`                                                 | `TimeoutDemo4Spec` |
+| Class                 | Description                                                                      | Tests                    |
+| --------------------- | -------------------------------------------------------------------------------- | ------------------------ |
+| `SimpleJoinDemo`      | Using the "natural" timeout and then join the result with original stream        | None                     |
+| `TimeoutSimpleDemo2`  | Like `SimpleJoinDemo` with a coded "timeout"                                     | None                     |
+| `TimeoutSimpleDemo2`  | Like `TimeoutSimpleDemo2` with a different result type for the `heavyWorkStream` | None                     |
+| `TimeoutKeyedMapDemo` | Sample use of `TimeoutKeyedMap`                                                  | `TimeoutKeyedMapDemoTest`|
+| `TimeoutMapDemo`      | Sample use of `TimeoutMap`                                                       | `TimeoutMapDemoTest`     |
 
 **Running Notes**
 
 From the project directory, run 
 `sbt clean publish-local`
 and then 
-`flink run -c org.tupol.flink.timeout.TimeoutDemo4 target/scala-2.10/flink-study_2.10-0.1.0.jar`
+`flink run -c org.tupol.flink.timeout.TimeoutMapDemo target/scala-2.10/flink-study_2.10-0.1.0.jar`
 
 
+### Objections
+
+1. "When using the ‘naïve’ block approach, I think the killer-feature of Apache Flink (the notion of event time and event order) is neglected."
+A quick look at the unit tests for both `TimeoutKeyedMapDemoTest` and `TimeoutMapDemoTest` shows that the order is preserved, providing that the final sink is single threaded.

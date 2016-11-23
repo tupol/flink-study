@@ -11,7 +11,7 @@ import utils._
 /**
  * Simple demo based on `TimeoutMap`
   */
-object TimeoutDemo4 extends DemoStreamProcessor with OutputFile {
+object TimeoutMapDemo extends DemoStreamProcessor with OutputFile {
 
 
   /** Main program method */
@@ -19,7 +19,7 @@ object TimeoutDemo4 extends DemoStreamProcessor with OutputFile {
 
     // get the execution environment
     val senv: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-    senv.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime)
+    senv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     // Setup the actual demo
     demoStreamProcessor(createRandomRecordsStream(senv), outputFile(args))
@@ -36,14 +36,15 @@ object TimeoutDemo4 extends DemoStreamProcessor with OutputFile {
    * @param outputFile
    */
   def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String): Unit = {
-    inputStream.print()
+
     // Trigger some time consuming operations on the stream
     val heavyWorkStream = inputStream
       .map(TimeoutMap[Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
       .setParallelism(4)
-    heavyWorkStream.print()
-    heavyWorkStream.
-      writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
+
+    heavyWorkStream
+      .setParallelism(1).
+      writeAsText(outputFile, WriteMode.OVERWRITE)
   }
 
 }
