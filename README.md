@@ -31,13 +31,20 @@ Also, I had a quick look on the corresponding [pull request](https://github.com/
     See `org.tupol.flink.timeout.TimeoutDemo` 1 to 4.
     The main problem with these approaches is that an extra thread is created inside each `Task` thread and it would be better if there would be a watchdog per `Task` to deal with the timeout of each thread.
 
-
 4.  ***If you want to go deeper, the API needs to support a transformation timeout on record and on window***
     *TODO: Study the current pull request better.*
     Another naive thought I had was having something in the Flink runtime `Task`, similar to `taskCancellationTimeout` property, somehow, but probably not the greatest gem.
     
 
 Code for this study is available in the `org.tupol.flink.timeout` package.
+
+| Class             | Description                                                                | Tests              |
+| ----------------- | -------------------------------------------------------------------------- | ------------------ |
+| `SimpleJoinDemo`  | Using the "natural" timeout and then join the result with original stream  | None               |
+| `TimeoutDemo1`    | Like `SimpleJoinDemo` with a coded "timeout"                               | None               |
+| `TimeoutDemo2`    | Like `TimeoutDemo1` with a different result type for the `heavyWorkStream` | None               |
+| `TimeoutDemo3`    | Sample use of `TimeoutKeyedMap`                                            | `TimeoutDemo3Spec` |
+| `TimeoutDemo4`    | Sample use of `TimeoutMap`                                                 | `TimeoutDemo4Spec` |
 
 **Running Notes**
 

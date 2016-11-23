@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 
 import scala.util.Try
 
+import utils._
 
 /**
  * Simple demo based on the initial raw idea for using async await, but this time bundling the original initial

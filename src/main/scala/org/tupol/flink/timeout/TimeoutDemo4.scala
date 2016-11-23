@@ -6,6 +6,7 @@ import org.apache.flink.streaming.api.scala._
 
 import scala.concurrent.duration._
 
+import utils._
 
 /**
  * Simple demo based on `TimeoutMap`
@@ -35,11 +36,12 @@ object TimeoutDemo4 extends DemoStreamProcessor with OutputFile {
    * @param outputFile
    */
   def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String): Unit = {
+    inputStream.print()
     // Trigger some time consuming operations on the stream
     val heavyWorkStream = inputStream
       .map(TimeoutMap[Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
       .setParallelism(4)
-
+    heavyWorkStream.print()
     heavyWorkStream.
       writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
   }

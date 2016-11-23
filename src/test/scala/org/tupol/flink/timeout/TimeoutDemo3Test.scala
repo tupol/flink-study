@@ -2,6 +2,7 @@ package org.tupol.flink.timeout
 
 import java.util.UUID
 
+import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.util.StreamingMultipleProgramsTestBase
 import org.junit.Test
@@ -18,6 +19,7 @@ class TimeoutDemo3Test extends StreamingMultipleProgramsTestBase {
 
     val outputFile = super.getTempFilePath(UUID.randomUUID().toString)
     val senv = StreamExecutionEnvironment.getExecutionEnvironment
+    senv.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime)
 
     val inputRecords: Seq[Record] = Seq(Record("a", 1000), Record("a", 1900), Record("b", 2100))
     val inputStream = senv.fromCollection(inputRecords)
