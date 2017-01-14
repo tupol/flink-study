@@ -9,7 +9,8 @@ import org.apache.flink.streaming.util.StreamingProgramTestBase
 import org.apache.flink.test.util.TestBaseUtils
 import org.junit.Test
 import org.scalatest.Matchers
-import org.tupol.flink.timeout.utils.RecordTimestampExtractor
+import org.tupol.flink.timeout.demo.{Record, TimeoutSimpleDemo1}
+import org.tupol.flink.timeout.demo.RecordTimestampExtractor
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
@@ -31,7 +32,7 @@ class TimeoutSimpleDemo1Test extends StreamingProgramTestBase with Matchers {
       val inputRecords: Seq[Record] = Seq(Record("a", 3000, 10), Record("b", 2500, 20), Record("c", 1500, 30), Record("d", 1000, 40))
       val inputStream = senv.fromCollection(inputRecords).assignTimestampsAndWatermarks(RecordTimestampExtractor)
 
-      TimeoutSimpleDemo1.demoStreamProcessor(inputStream, outputFile)
+      TimeoutSimpleDemo1.demoStreamProcessor(inputStream, outputFile, 1000)
 
       senv.execute()
 

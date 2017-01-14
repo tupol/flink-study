@@ -1,12 +1,11 @@
-package org.tupol.flink.timeout
+package org.tupol.flink.timeout.demo
 
 import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
+import org.tupol.flink.timeout.TimeoutMap
 
 import scala.concurrent.duration._
-
-import utils._
 
 /**
  * Simple demo based on `TimeoutMap`
@@ -21,8 +20,17 @@ object TimeoutMapDemo extends DemoStreamProcessor with OutputFile {
     val senv: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     senv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
+    val (file, timeout) = args match {
+      case Array(file) => (file, 1000L)
+      case Array(file, timeout) => (file, timeout.toLong)
+      case _ => sys.error("Incorrect parameters; expected file path and an optional timeout in millis")
+    }
+
+    val inputRecords = recordsFromFile(file).toSeq
+    val inputStream = senv.fromCollection(inputRecords).assignTimestampsAndWatermarks(RecordTimestampExtractor)
+
     // Setup the actual demo
-    demoStreamProcessor(createRandomRecordsStream(senv), outputFile(args))
+    demoStreamProcessor(inputStream, outputFile(), timeout)
 
     // Setup the actual demo
     senv.execute(s"${this.getClass.getSimpleName}")
@@ -35,16 +43,15 @@ object TimeoutMapDemo extends DemoStreamProcessor with OutputFile {
    * @param inputStream
    * @param outputFile
    */
-  def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String): Unit = {
-
+  def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String, timeoutMs: Long): Unit = {
     // Trigger some time consuming operations on the stream
     val heavyWorkStream = inputStream
-      .map(TimeoutMap[Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
       .setParallelism(4)
+      .map( TimeoutMap[Record, String](timeoutMs millis)( timeConsumingOperation ) )
 
     heavyWorkStream
-      .setParallelism(1).
-      writeAsText(outputFile, WriteMode.OVERWRITE)
+      .setParallelism(1)
+      .writeAsText(outputFile, WriteMode.OVERWRITE)
   }
 
 }

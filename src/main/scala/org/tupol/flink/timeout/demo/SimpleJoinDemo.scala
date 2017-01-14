@@ -1,11 +1,11 @@
-package org.tupol.flink.timeout
+package org.tupol.flink.timeout.demo
 
 import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
-import utils._
+
 
 import scala.util.Try
 
@@ -41,17 +41,17 @@ object SimpleJoinDemo extends DemoStreamProcessor with OutputFile {
    * @param inputStream
    * @param outputFile
    */
-  override def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String): Unit = {
+  override def demoStreamProcessor(inputStream: DataStream[Record], outputFile: String, timeoutMs: Long = 1000): Unit = {
 
     // Trigger some time consuming operations
-    val heavyWorkStream: DataStream[(Record, Try[String])] = inputStream
-      .map{ record => (record, Try(timeConsumingOperation(record.time))) }
+    val heavyWorkStream: DataStream[(String, Try[String])] = inputStream
+      .map{ record => (record.key, Try(timeConsumingOperation(record))) }
       .setParallelism(4)
       .keyBy(0)
 
     heavyWorkStream.writeAsText(s"$outputFile-1", WriteMode.OVERWRITE).setParallelism(1)
 
-    val joinedStream = inputStream.join(heavyWorkStream.filter(_._2.isSuccess)).where(_.key).equalTo(_._1.key)
+    val joinedStream = inputStream.join(heavyWorkStream.filter(_._2.isSuccess)).where(_.key).equalTo(_._1)
       .window(TumblingProcessingTimeWindows.of(Time.seconds(2)))
       .apply{ (a, b) => (a, b) }
       .setParallelism(2)

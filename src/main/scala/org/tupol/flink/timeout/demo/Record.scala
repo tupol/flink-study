@@ -1,4 +1,4 @@
-package org.tupol.flink.timeout
+package org.tupol.flink.timeout.demo
 
 /**
  * Define a simple type for our records, having a string key and a random number, which we will use to

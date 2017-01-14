@@ -5,10 +5,7 @@ version := "0.1.0"
 scalaVersion := "2.10.4"
 
 
-val flinkVersion = "1.1.3"
-
-// ------------------------------
-// DEPENDENCIES AND RESOLVERS
+val flinkVersion = "1.2.0"
 
 lazy val providedDependencies = Seq(
   "org.apache.flink" %% "flink-scala" % flinkVersion force(),
@@ -16,7 +13,7 @@ lazy val providedDependencies = Seq(
   "org.apache.flink" %% "flink-streaming-scala" % flinkVersion force()
 )
 
-libraryDependencies ++= providedDependencies.map(_ % "provided")
+libraryDependencies ++= providedDependencies //.map(_ % "provided")
 
 
 libraryDependencies ++= Seq(
