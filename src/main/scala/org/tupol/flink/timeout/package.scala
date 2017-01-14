@@ -3,6 +3,7 @@ package org.tupol.flink
 import org.apache.flink.api.common.functions.RichMapFunction
 
 import scala.util.Try
+import scala.concurrent.duration.Duration
 
 package object timeout {
 
@@ -18,12 +19,12 @@ package object timeout {
    * @tparam I the input value type
    * @tparam O the output type
    */
-  case class TimeoutMap[I, O](timeout: scala.concurrent.duration.Duration)(f: I => O)
-    extends RichMapFunction[I, (I, Try[O])] {
-    override def map(input: I): (I, Try[O]) = {
+  case class TimeoutMap[I, O](timeout: Duration)(f: I => O)
+    extends RichMapFunction[I, Try[O]] {
+    override def map(input: I): Try[O] = {
       import scala.concurrent._
       import ExecutionContext.Implicits.global
-      ( input, Try { Await.result(future(f(input)), timeout) } )
+      Try { Await.result(future(f(input)), timeout) }
     }
   }
 
