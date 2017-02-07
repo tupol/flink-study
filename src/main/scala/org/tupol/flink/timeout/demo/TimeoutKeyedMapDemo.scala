@@ -1,11 +1,11 @@
-package org.tupol.flink.timeout
+package org.tupol.flink.timeout.demo
 
 import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.tupol.flink.timeout.utils._
+import org.tupol.flink.timeout.TimeoutKeyedMap
 
 import scala.concurrent.duration._
 import scala.util.Try

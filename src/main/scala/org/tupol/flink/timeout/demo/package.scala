@@ -2,8 +2,7 @@ package org.tupol.flink.timeout
 
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
-import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, DataStream}
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.watermark.Watermark
 
 import scala.util.Try
@@ -11,7 +10,7 @@ import scala.util.Try
 /**
  * Basic utilities to make life easier
  */
-object utils {
+package object demo {
 
   /**
    * Basic demo function

@@ -9,7 +9,8 @@ import org.apache.flink.streaming.util.StreamingProgramTestBase
 import org.apache.flink.test.util.TestBaseUtils
 import org.junit.Test
 import org.scalatest.Matchers
-import org.tupol.flink.timeout.utils.RecordTimestampExtractor
+import org.tupol.flink.timeout.demo.{Record, TimeoutSimpleDemo1}
+import org.tupol.flink.timeout.demo._
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try

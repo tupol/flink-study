@@ -1,4 +1,4 @@
-package org.tupol.flink.timeout
+package org.tupol.flink.timeout.demo
 
 import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.TimeCharacteristic
@@ -6,9 +6,8 @@ import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 
-import scala.util.Try
 
-import utils._
+import scala.util.Try
 
 /**
  * Simple demo based on the initial raw idea for using async await, but this time bundling the original initial
