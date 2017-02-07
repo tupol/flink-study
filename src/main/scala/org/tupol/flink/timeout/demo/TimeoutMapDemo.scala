@@ -21,7 +21,7 @@ object TimeoutMapDemo extends DemoStreamProcessor with OutputFile {
     senv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     // Setup the actual demo
-    demoStreamProcessor(createRandomRecordsStream(senv), outputFile(args))
+    demoStreamProcessor(createRandomRecordsStream(senv, 100), outputFile(args))
 
     // Setup the actual demo
     senv.execute(s"${this.getClass.getSimpleName}")
@@ -38,12 +38,11 @@ object TimeoutMapDemo extends DemoStreamProcessor with OutputFile {
 
     // Trigger some time consuming operations on the stream
     val heavyWorkStream = inputStream
-      .map(TimeoutMap[Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
+      .map(TimeoutMap[Record, (String, String)](2 seconds){ in: Record => (in.key, timeConsumingOperation(in.time)) })
       .setParallelism(4)
 
     heavyWorkStream
-      .setParallelism(1).
-      writeAsText(outputFile, WriteMode.OVERWRITE)
+      .writeAsText(outputFile, WriteMode.OVERWRITE)
   }
 
 }

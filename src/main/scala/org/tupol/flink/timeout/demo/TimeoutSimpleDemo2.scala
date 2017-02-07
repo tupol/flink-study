@@ -57,8 +57,7 @@ object TimeoutSimpleDemo2 extends DemoStreamProcessor with OutputFile {
       .setParallelism(2)
 
     joinedStream
-      .setParallelism(1)
-      .writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
+      .writeAsText(outputFile, WriteMode.OVERWRITE)
 
   }
 }

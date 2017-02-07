@@ -9,7 +9,7 @@ package object timeout {
   /**
    * A RichMapFunction function that takes a timeout parameter and a function from value to output.
    *
-   * The actual map function works on values and returns a tuple of input and try of mapping input to output.
+   * The actual map function works on values and returns a try of mapping input to output.
    *
    * When the time runs out, the mapped value will be a failure of `java.util.concurrent.TimeoutException`.
    *
@@ -19,11 +19,11 @@ package object timeout {
    * @tparam O the output type
    */
   case class TimeoutMap[I, O](timeout: scala.concurrent.duration.Duration)(f: I => O)
-    extends RichMapFunction[I, (I, Try[O])] {
-    override def map(input: I): (I, Try[O]) = {
+    extends RichMapFunction[I, Try[O]] {
+    override def map(input: I): Try[O] = {
       import scala.concurrent._
       import ExecutionContext.Implicits.global
-      ( input, Try { Await.result(future(f(input)), timeout) } )
+      Try { Await.result(future(f(input)), timeout) }
     }
   }
 

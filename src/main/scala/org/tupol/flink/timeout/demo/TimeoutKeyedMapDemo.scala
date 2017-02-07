@@ -3,8 +3,6 @@ package org.tupol.flink.timeout.demo
 import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
-import org.apache.flink.streaming.api.windowing.time.Time
 import org.tupol.flink.timeout.TimeoutKeyedMap
 
 import scala.concurrent.duration._
@@ -23,7 +21,7 @@ object TimeoutKeyedMapDemo extends DemoStreamProcessor with OutputFile {
     senv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     // Setup the actual demo
-    demoStreamProcessor(createRandomRecordsStream(senv), outputFile(args))
+    demoStreamProcessor(createRandomRecordsStream(senv, 100), outputFile(args))
 
     // Setup the actual demo
     senv.execute(s"${this.getClass.getSimpleName}")
@@ -43,12 +41,8 @@ object TimeoutKeyedMapDemo extends DemoStreamProcessor with OutputFile {
       .map(TimeoutKeyedMap[String, Record, String](2 seconds){ in: Record => timeConsumingOperation(in.time) })
       .setParallelism(4)
 
-    val joinedStream = inputStream.join(heavyWorkStream).where(_.key).equalTo(_._1)
-      .window(TumblingEventTimeWindows.of(Time.seconds(4)))
-      .apply{ (a, b) => (a, b._2) }
+    heavyWorkStream
+      .writeAsText(outputFile, WriteMode.OVERWRITE)
 
-    joinedStream
-      .setParallelism(1)
-      .writeAsText(outputFile, WriteMode.OVERWRITE).setParallelism(1)
   }
 }
